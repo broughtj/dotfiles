@@ -88,7 +88,7 @@
           users.users.tjb.home = "/Users/tjb/";
         };
         cooder = { pkgs, ...}: {
-          import = [ darwinSystem ];
+          imports = [ darwinSystem ];
 
           nixpkgs.hostPlatform = "aarch64-darwin";
 
