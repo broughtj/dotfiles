@@ -80,12 +80,19 @@
 
           homebrew.enable = true;
           homebrew.casks = [
+            "dropbox"
             "fantastical"
             "google-chrome"
+            "google-drive"
+            "mathpix-snipping-tool"
             "slack"
             "spotify"
             "todoist"
+            "visual-studio-code"
+            "vlc"
+            "warp"
             "zoom"
+            "zotero"
           ];
         };
         oldBen = { ... }: {
