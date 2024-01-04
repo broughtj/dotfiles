@@ -10,3 +10,7 @@ nix run --extra-experimental-features nix-command --extra-experimental-features 
 nix run /path/to/flake.nix#homeConfigurations.tjb@Hostname.activationPackage
 ```
 
+
+## Home Manager Options
+
+

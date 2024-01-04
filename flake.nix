@@ -77,6 +77,13 @@
           environment.systemPackages = [ pkgs.vim ];
 
           programs.zsh.enable = true;
+
+          homebrew.enable = true;
+          homebrew.casks = [
+            "spotify"
+            "slack"
+            "zoom"
+          ];
         };
         oldBen = { ... }: {
           imports = [ darwinSystem ];
@@ -101,6 +108,18 @@
 
           # home.username = "tjb";
           home.homeDirectory = "/Users/${config.home.username}";
+
+          home.packages = with pkgs; [
+            tree 
+            ripgrep
+          ];
+
+          programs.git = {
+            enable = true;
+            userName = "Tyler Brough";
+            userEmail = "broughtj@gmail.com";
+            extraConfig.init.defaultBranch = "main";
+          };
         };
         homeOldBen = { ... }: {
           imports = [ home ];
