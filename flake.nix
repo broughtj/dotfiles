@@ -59,74 +59,81 @@
   };
 
   outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager }:
-  let
-    system = { pkgs, ... }: {
-      # List packages installed in system profile. To search by name, run:
-      # $ nix-env -qaP | grep wget
-      environment.systemPackages =
-        [ pkgs.vim
-        ];
+    rec {
+      nixosModules = rec {
+        darwinSystem = { pkgs, ... }: {
+          # Set Git commit hash for darwin-version.
+          system.configurationRevision = self.rev or self.dirtyRev or null;
+          # Used for backwards compatibility, please read the changelog before changing.
+          # $ darwin-rebuild changelog
+          system.stateVersion = 4;
+          # Auto upgrade nix package and the daemon service.
+          services.nix-daemon.enable = true;
+          # Necessary for using flakes on this system.
+          nix.settings.experimental-features = "nix-command flakes";
 
-      # Auto upgrade nix package and the daemon service.
-      services.nix-daemon.enable = true;
-      # nix.package = pkgs.nix;
+          # List packages installed in system profile. To search by name, run:
+          # $ nix-env -qaP | grep wget
+          environment.systemPackages = [ pkgs.vim ];
 
-      # Necessary for using flakes on this system.
-      nix.settings.experimental-features = "nix-command flakes";
+          programs.zsh.enable = true;
+        };
+        oldBen = { ... }: {
+          imports = [ darwinSystem ];
 
-      # Create /etc/zshrc that loads the nix-darwin environment.
-      programs.zsh.enable = true;  # default shell on catalina
-      # programs.fish.enable = true;
+          # The platform the configuration will be used on.
+          nixpkgs.hostPlatform = "aarch64-darwin";
 
-      # Set Git commit hash for darwin-version.
-      system.configurationRevision = self.rev or self.dirtyRev or null;
+          # This is TJB now rather than autogen stuff
+          users.users.tjb.home = "/Users/tjb/";
+        };
+        cooder = { pkgs, ...}: {
+          import = [ darwinSystem ];
 
-      # Used for backwards compatibility, please read the changelog before changing.
-      # $ darwin-rebuild changelog
-      system.stateVersion = 4;
+          nixpkgs.hostPlatform = "aarch64-darwin";
 
-      # The platform the configuration will be used on.
-      nixpkgs.hostPlatform = "aarch64-darwin";
+          users.users.tylerbrough.home = "/Users/tylerbrough";
+        };
+        home = { config, pkgs, ... }: {
+          # No touchy, seriously don't ever change this
+          home.stateVersion = "23.11";
+          programs.home-manager.enable = true;
 
-      # This is TJB now rather than autogen stuff
-      users.users.tjb.home = "/Users/tjb/";
-    };
-    home = { pkgs, ... }: {
-      home.username = "tjb";
-      home.homeDirectory = "/Users/tjb";
+          # home.username = "tjb";
+          home.homeDirectory = "/Users/${config.home.username}";
+        };
+        homeOldBen = { ... }: {
+          imports = [ home ];
 
-      # No touchy, seriously don't ever change this
-      home.stateVersion = "23.11";
+          home.username = "tjb";
+        };
+        homeCooder = { ... }: {
+          imports = [ home ];
 
-      programs.home-manager.enable = true;
-
-      # Your stuff here:
-    };
-  in
-  {
-    # Build darwin flake using:
-    # $ darwin-rebuild build --flake .#simple
-    darwinConfigurations."Old-Ben" = nix-darwin.lib.darwinSystem {
-      modules = [ system ];
-    };
-
-    # Expose the package set, including overlays, for convenience.
-    darwinPackages = self.darwinConfigurations."Old-Ben".pkgs;
-
-    homeConfigurations."tjb@Old-Ben" = home-manager.lib.homeManagerConfiguration {
-      # Still don't totally understand importing is necessary here, but I haven't found a better way.
-      pkgs = import nixpkgs {
-        system = "aarch64-darwin";
-        config.allowUnfree = true;
+          home.username = "tylerbrough";
+        };
       };
-
-      # Specify your home configuration modules here, for example,
-      # the path to your home.nix.
-      # If you would like to split into multiple files in the future, this is the place to do it.
-      modules = [ home ];
-
-      # Optionally use extraSpecialArgs
-      # to pass through arguments to home.nix
+      # Build darwin flake using:
+      # $ darwin-rebuild build --flake .#simple
+      darwinConfigurations."Old-Ben" = nix-darwin.lib.darwinSystem {
+        modules = [ nixosModules.oldBen ];
+      };
+      homeConfigurations."tjb@Old-Ben" = home-manager.lib.homeManagerConfiguration {
+        pkgs = import nixpkgs {
+          system = "aarch64-darwin";
+          config.allowUnfree = true;
+        };
+        modules = [ nixosModules.homeOldBen ];
+      };
+      darwinConfigurations."Cooder" = nix-darwin.lib.darwinSystem {
+        modules = [ nixosModules.cooder ];
+      };
+      homeConfigurations."tylerbrough@Cooder" = home-manager.lib.homeManagerConfiguration {
+        pkgs = import nixpkgs {
+          system = "aarch64-darwin";
+          config.allowUnfree = true;
+        };
+        modules = [ nixosModules.homeCooder ];
+      };
     };
-  };
 }
