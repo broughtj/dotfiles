@@ -7,6 +7,6 @@ nix run --extra-experimental-features nix-command --extra-experimental-features 
 ## To Instantiate Home-Manager
 
 ```{shell}
-nix run /path/to/flake.nix#tjb@Hostname.activationPackage
+nix run /path/to/flake.nix#homeConfigurations.tjb@Hostname.activationPackage
 ```
 
