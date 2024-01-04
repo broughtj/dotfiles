@@ -35,6 +35,14 @@
   # There's some syntax for `let` bindings, and there's a fancy thing for `with`,
   # but other than that, that's basically the whole thing.
   #
+  # There is also the inherit syntax, which just helps reduce boilerplate. The syntax
+  #
+  # { inherit foo; }
+  #
+  # is just sugar for
+  #
+  # { foo = foo; }
+  #
   # The whole point of this is that we functionally describe package dependencies
   # without any side-effects. No implicit dependencies is the whole goal.
   #
@@ -56,9 +64,22 @@
 
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
+    emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager }:
+  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, emacs-overlay }:
+    let
+      emacsOverlay = (pkgs: package: 
+        (pkgs.emacsWithPackagesFromUsePackage {
+          inherit package;
+          config = ./emacs.el;
+          defaultInitFile = true;
+          alwaysEnsure = true;
+        })
+      );
+    in
     rec {
       nixosModules = rec {
         darwinSystem = { pkgs, ... }: {
@@ -85,6 +106,7 @@
             "google-chrome"
             "google-drive"
             "mathpix-snipping-tool"
+            "modular"
             "slack"
             "spotify"
             "todoist"
@@ -112,6 +134,8 @@
           users.users.tylerbrough.home = "/Users/tylerbrough";
         };
         home = { config, pkgs, ... }: {
+          imports = [ emacsConfiguration ];
+
           # No touchy, seriously don't ever change this
           home.stateVersion = "23.11";
           programs.home-manager.enable = true;
@@ -130,6 +154,9 @@
             userEmail = "broughtj@gmail.com";
             extraConfig.init.defaultBranch = "main";
           };
+
+          programs.emacs.package = emacsOverlay pkgs pkgs.emacs29-macport;
+          home.sessionVariables.EDITOR = "emacsclient";
         };
         homeOldBen = { ... }: {
           imports = [ home ];
@@ -140,6 +167,11 @@
           imports = [ home ];
 
           home.username = "tylerbrough";
+        };
+        emacsConfiguration = { pkgs, ... }: {
+          nixpkgs.overlays = with emacs-overlay.overlays; [ emacs package ];
+
+          programs.emacs.enable = true;
         };
       };
       # Build darwin flake using:
