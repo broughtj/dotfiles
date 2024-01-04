@@ -80,8 +80,11 @@
 
           homebrew.enable = true;
           homebrew.casks = [
-            "spotify"
+            "fantastical"
+            "google-chrome"
             "slack"
+            "spotify"
+            "todoist"
             "zoom"
           ];
         };
