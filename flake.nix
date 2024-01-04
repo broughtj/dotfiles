@@ -92,12 +92,18 @@
           services.nix-daemon.enable = true;
           # Necessary for using flakes on this system.
           nix.settings.experimental-features = "nix-command flakes";
+          nix.package = pkgs.nixFlakes;
 
           # List packages installed in system profile. To search by name, run:
           # $ nix-env -qaP | grep wget
-          environment.systemPackages = [ pkgs.vim ];
+          environment.systemPackages = [ pkgs.neovim ];
 
-          programs.zsh.enable = true;
+          # programs.zsh = {
+	    # enable = true;
+            # enableAutosuggestions = true;
+          # }
+	  
+          programs.fish.enable = true;
 
           homebrew.enable = true;
           homebrew.casks = [
@@ -117,21 +123,29 @@
             "zotero"
           ];
         };
-        oldBen = { ... }: {
+        oldBen = { pkgs, ... }: {
           imports = [ darwinSystem ];
 
           # The platform the configuration will be used on.
           nixpkgs.hostPlatform = "aarch64-darwin";
 
           # This is TJB now rather than autogen stuff
-          users.users.tjb.home = "/Users/tjb/";
+          users.users.tjb = {
+            home = "/Users/tjb/";
+	    #shell = pkgs.zsh;
+            shell = pkgs.fish;
+          };
         };
         cooder = { pkgs, ...}: {
           imports = [ darwinSystem ];
 
           nixpkgs.hostPlatform = "aarch64-darwin";
 
-          users.users.tylerbrough.home = "/Users/tylerbrough";
+          users.users.tylerbrough = {
+            home = "/Users/tylerbrough";
+	    #shell = pkgs.zsh;
+            shell = pkgs.fish;
+          };
         };
         home = { config, pkgs, ... }: {
           imports = [ emacsConfiguration ];
@@ -140,13 +154,17 @@
           home.stateVersion = "23.11";
           programs.home-manager.enable = true;
 
-          # home.username = "tjb";
           home.homeDirectory = "/Users/${config.home.username}";
 
           home.packages = with pkgs; [
-            tree 
+            direnv
+            pandoc
             ripgrep
+            tree 
           ];
+
+          #programs.zsh.enable = true;
+	  programs.fish.enable = true;
 
           programs.git = {
             enable = true;
