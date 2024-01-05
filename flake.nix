@@ -113,6 +113,7 @@
             "google-drive"
             "mathpix-snipping-tool"
             "modular"
+	    "nushell"
             "slack"
             "spotify"
             "todoist"
