@@ -52,7 +52,7 @@
   # Articles:
   #
   # Article describing flakes and specifically the output schema:
-  # https://nixos.wiki/wiki/Flakes#Flake_schema
+ # https://nixos.wiki/wiki/Flakes#Flake_schema
   #
   #
 
@@ -103,7 +103,8 @@
             # enableAutosuggestions = true;
           # }
 	  
-          programs.fish.enable = true;
+          #programs.fish.enable = true;
+	  programs.nushell.enable = true;
 
           homebrew.enable = true;
           homebrew.casks = [
@@ -132,7 +133,8 @@
           users.users.tjb = {
             home = "/Users/tjb/";
 	    #shell = pkgs.zsh;
-            shell = pkgs.fish;
+            #shell = pkgs.fish;
+	    shell = pkgs.nushell;
           };
         };
         cooder = { pkgs, ...}: {
@@ -143,7 +145,8 @@
           users.users.tylerbrough = {
             home = "/Users/tylerbrough";
 	    #shell = pkgs.zsh;
-            shell = pkgs.fish;
+            #shell = pkgs.fish;
+	    shell = pkgs.nushell;
           };
         };
         home = { config, pkgs, ... }: {
@@ -157,14 +160,14 @@
 
           home.packages = with pkgs; [
             direnv
-            nushell
             pandoc
             ripgrep
             tree 
           ];
 
           #programs.zsh.enable = true;
-	  programs.fish.enable = true;
+	  #programs.fish.enable = true;
+	  programs.nushell.enable = true;
 
           programs.git = {
             enable = true;
