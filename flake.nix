@@ -103,8 +103,8 @@
             # enableAutosuggestions = true;
           # }
 	  
-          #programs.fish.enable = true;
-	  programs.nushell.enable = true;
+          programs.fish.enable = true;
+	  #programs.nushell.enable = true;
 
           homebrew.enable = true;
           homebrew.casks = [
@@ -133,8 +133,8 @@
           users.users.tjb = {
             home = "/Users/tjb/";
 	    #shell = pkgs.zsh;
-            #shell = pkgs.fish;
-	    shell = pkgs.nushell;
+            shell = pkgs.fish;
+	    #shell = pkgs.nushell;
           };
         };
         cooder = { pkgs, ...}: {
@@ -145,8 +145,8 @@
           users.users.tylerbrough = {
             home = "/Users/tylerbrough";
 	    #shell = pkgs.zsh;
-            #shell = pkgs.fish;
-	    shell = pkgs.nushell;
+            shell = pkgs.fish;
+	    #shell = pkgs.nushell;
           };
         };
         home = { config, pkgs, ... }: {
@@ -166,8 +166,8 @@
           ];
 
           #programs.zsh.enable = true;
-	  #programs.fish.enable = true;
-	  programs.nushell.enable = true;
+	  programs.fish.enable = true;
+	  #programs.nushell.enable = true;
 
           programs.git = {
             enable = true;
