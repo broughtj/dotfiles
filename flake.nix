@@ -112,8 +112,6 @@
             "google-chrome"
             "google-drive"
             "mathpix-snipping-tool"
-            "modular"
-	    "nushell"
             "slack"
             "spotify"
             "todoist"
@@ -124,7 +122,7 @@
             "zotero"
           ];
         };
-        oldBen = { pkgs, ... }: {
+        frisell = { pkgs, ... }: {
           imports = [ darwinSystem ];
 
           # The platform the configuration will be used on.
@@ -159,6 +157,7 @@
 
           home.packages = with pkgs; [
             direnv
+            nushell
             pandoc
             ripgrep
             tree 
@@ -177,7 +176,7 @@
           programs.emacs.package = emacsOverlay pkgs pkgs.emacs29-macport;
           home.sessionVariables.EDITOR = "emacsclient";
         };
-        homeOldBen = { ... }: {
+        homeFrisell = { ... }: {
           imports = [ home ];
 
           home.username = "tjb";
@@ -195,15 +194,15 @@
       };
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#simple
-      darwinConfigurations."Old-Ben" = nix-darwin.lib.darwinSystem {
-        modules = [ nixosModules.oldBen ];
+      darwinConfigurations."Frisell" = nix-darwin.lib.darwinSystem {
+        modules = [ nixosModules.frisell ];
       };
-      homeConfigurations."tjb@Old-Ben" = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations."tjb@Frisell" = home-manager.lib.homeManagerConfiguration {
         pkgs = import nixpkgs {
           system = "aarch64-darwin";
           config.allowUnfree = true;
         };
-        modules = [ nixosModules.homeOldBen ];
+        modules = [ nixosModules.homeFrisell ];
       };
       darwinConfigurations."Cooder" = nix-darwin.lib.darwinSystem {
         modules = [ nixosModules.cooder ];
