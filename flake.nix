@@ -102,9 +102,11 @@
 	    # enable = true;
             # enableAutosuggestions = true;
           # }
-	  
+	 
           programs.fish.enable = true;
+	  #programs.zsh.enable = false;
 	  #programs.nushell.enable = true;
+
 
           homebrew.enable = true;
           homebrew.casks = [
