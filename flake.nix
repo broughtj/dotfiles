@@ -162,6 +162,7 @@
 
           home.packages = with pkgs; [
             direnv
+	    nushell
             pandoc
             ripgrep
             tree 
