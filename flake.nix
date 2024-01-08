@@ -115,6 +115,7 @@
             "google-chrome"
             "google-drive"
             "mathpix-snipping-tool"
+	    "obsidian"
             "slack"
             "spotify"
             "todoist"
