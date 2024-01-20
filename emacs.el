@@ -83,6 +83,7 @@
 
 (use-package magit)
 
+
 ;; TODO: This is copied from broughjt. Understand it better!
 (setq org-src-preserve-indentation nil
       org-edit-src-content-indentation 0
@@ -108,3 +109,29 @@
 
 (use-package org-fragtog
   :hook (org-mode . org-fragtog-mode))
+
+
+;; Okay, let's do this! Org-Roam Setup
+(use-package org-roam
+  :custom
+  (org-roam-v2-ack t)
+  (org-directory "~/Dropbox/org")
+  (org-roam-directory "~/Dropbox/orgroam")
+  (org-roam-dailies-directory "~/Dropbox/orgroam/dailies")
+  (org-cite-global-bibliography '("~/Dropbox/orgroam/biblio.bib"))
+  (org-roam-capture-templates
+    '(("d" "default" plain
+       "%?" :target
+       (file+head "pages/${slug}.org" "#+title: ${title}\n")
+       :unnarrowed t)))
+   :bind (("C-c n l" . org-roam-buffer-toggle)
+	  ("C-c n f" . org-roam-node-find)
+	  ("C-c n i" . org-roam-node-insert)
+	  ;; ("C-c n t" . org-roam-dailies-capture-today)
+	  ;; ("C-c n a" . org-agenda)
+	  ;; ("C-c n b" . org-iswitchb)
+	  )
+   :config
+   (require 'oc-basic)
+   (org-roam-setup))
+
