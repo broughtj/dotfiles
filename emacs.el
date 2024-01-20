@@ -116,11 +116,11 @@
   :custom
   (org-roam-v2-ack t)
   (org-directory "~/Dropbox/org")
-  (org-roam-directory "~/Dropbox/orgroam")
+  (org-roam-directory "~/Dropbox/orgroam/notes")
   (org-roam-dailies-directory "~/Dropbox/orgroam/dailies")
-  (org-cite-global-bibliography '("~/Dropbox/orgroam/biblio.bib"))
+  (org-cite-global-bibliography '("~/Dropbox/orgroam/notes/biblio.bib"))
   (org-roam-capture-templates
-    '(("d" "default" plain
+   '(("d" "default" plain
        "%?" :target
        (file+head "pages/${slug}.org" "#+title: ${title}\n")
        :unnarrowed t)))
@@ -135,3 +135,33 @@
    (require 'oc-basic)
    (org-roam-setup))
 
+
+
+;;(use-package org-roam
+;;  :custom
+;;  (org-roam-v2-ack t)
+;;  (org-directory "~/share")
+;;  (org-roam-directory "~/share/notes")
+;;  (org-roam-dailies-directory "journals/")
+;;  (org-cite-global-bibliography '("~/share/notes/citations.bib"))
+;;  (org-roam-capture-templates
+;;   '(("d" "default" plain
+;;      "%?" :target
+;;      (file+head "pages/${slug}.org" "#+title: ${title}\n")
+;;      :unnarrowed t)))
+;;  ;; (org-agenda-files '("~/share/notes" "~/share/notes/daily" "~/share/org"))
+;;  ;; (org-roam-dailies-capture-templates
+;;   ;; '(("d" "default" entry
+;;      ;; "* %?"
+;;      ;; :target (file+head "%<%Y-%m-%d>.org"
+;;                         ;; "#+title: %<%Y-%m-%d>\n\n"))))
+;;  :bind (("C-c n l" . org-roam-buffer-toggle)
+;;         ("C-c n f" . org-roam-node-find)
+;;         ("C-c n i" . org-roam-node-insert)
+;;         ;; ("C-c n t" . org-roam-dailies-capture-today)
+;;         ;; ("C-c n a" . org-agenda)
+;;         ;; ("C-c n b" . org-iswitchb)
+;;         )
+;;  :config
+;;  (require 'oc-basic)
+;;  (org-roam-setup))
