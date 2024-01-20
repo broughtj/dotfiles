@@ -82,3 +82,29 @@
   (envrc-global-mode))
 
 (use-package magit)
+
+;; TODO: This is copied from broughjt. Understand it better!
+(setq org-src-preserve-indentation nil
+      org-edit-src-content-indentation 0
+      org-confirm-babel-evaluate nil
+      org-babel-load-languages
+        '((emacs-lisp . t)
+          (shell . t)
+          (python . t))
+      org-latex-compiler "lualatex"
+      org-latex-create-formula-image-program 'dvisvgm
+      org-preview-latex-image-directory temporary-file-directory
+      org-latex-packages-alist '(("" "bussproofs" t))
+      org-startup-with-latex-preview t
+      org-startup-with-inline-images t
+      org-agenda-span 14)
+(add-hook 'org-mode-hook 'turn-on-auto-fill)
+
+(use-package org-ql)
+(use-package org-roam-ql)
+
+(use-package org-modern
+  :hook (org-mode . org-modern-mode))
+
+(use-package org-fragtog
+  :hook (org-mode . org-fragtog-mode))
