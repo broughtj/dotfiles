@@ -122,13 +122,13 @@
   (org-roam-capture-templates
    '(("d" "default" plain
        "%?" :target
-       (file+head "pages/${slug}.org" "#+title: ${title}\n")
+       (file+head "${slug}.org" "#+title: ${title}\n")
        :unnarrowed t)))
    :bind (("C-c n l" . org-roam-buffer-toggle)
 	  ("C-c n f" . org-roam-node-find)
 	  ("C-c n i" . org-roam-node-insert)
-	  ;; ("C-c n t" . org-roam-dailies-capture-today)
-	  ;; ("C-c n a" . org-agenda)
+	  ("C-c n t" . org-roam-dailies-capture-today)
+	  ("C-c n a" . org-agenda)
 	  ;; ("C-c n b" . org-iswitchb)
 	  )
    :config
