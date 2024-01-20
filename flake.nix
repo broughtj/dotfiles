@@ -102,9 +102,11 @@
 	    # enable = true;
             # enableAutosuggestions = true;
           # }
-	  
+	 
           programs.fish.enable = true;
+	  #programs.zsh.enable = false;
 	  #programs.nushell.enable = true;
+
 
           homebrew.enable = true;
           homebrew.casks = [
@@ -113,6 +115,7 @@
             "google-chrome"
             "google-drive"
             "mathpix-snipping-tool"
+	    "obsidian"
             "slack"
             "spotify"
             "todoist"
@@ -160,6 +163,7 @@
 
           home.packages = with pkgs; [
             direnv
+	    nushell
             pandoc
             ripgrep
             tree 
