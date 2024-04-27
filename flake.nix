@@ -110,11 +110,13 @@
 
           homebrew.enable = true;
           homebrew.casks = [
+	    "ddjvu"
             "dropbox"
             "fantastical"
             "google-chrome"
             "google-drive"
             "mathpix-snipping-tool"
+	    "microsoft-teams"
 	    "obsidian"
             "slack"
             "spotify"
@@ -164,7 +166,7 @@
           home.packages = with pkgs; [
             direnv
 	    nushell
-            pandoc
+	    pandoc
             ripgrep
             tree 
           ];
