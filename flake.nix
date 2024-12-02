@@ -171,6 +171,7 @@
 	    pandoc
             ripgrep
             tree 
+	    unrar
           ];
 
           #programs.zsh.enable = true;
