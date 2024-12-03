@@ -92,7 +92,8 @@
           services.nix-daemon.enable = true;
           # Necessary for using flakes on this system.
           nix.settings.experimental-features = "nix-command flakes";
-          nix.package = pkgs.nixFlakes;
+          #nix.package = pkgs.nixFlakes;
+	  nix.package = pkgs.nixVersions.stable;
 
           # List packages installed in system profile. To search by name, run:
           # $ nix-env -qaP | grep wget
