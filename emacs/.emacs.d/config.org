@@ -1,4 +1,4 @@
-#+title: TJB's Emacs Configuration
+#+title: TJB's Literate Emacs Configuration
 #+author: Tyler J. Brough 
 #+email: broughtj@gmail.com
 #+language: en
@@ -6,6 +6,19 @@
 #+startup: content indent
 #+macro: latest-export-date (eval (format-time-string "%F %T %z"))
 #+macro: word-count (eval (count-words (point-min) (point-max)))
+
+* /Notice/
+
+I am trying to follow [[https://protesilaos.com/][Prot's]] configuration, but it is super complicated and way over my head /for now/. Prot has a nice post on [[https://protesilaos.com/codelog/2024-11-28-basic-emacs-configuration/][Emacs: a basic and capable configuration]]. My plan is to start with a literate version of his basic setup and then work my way forward as I learn and grow into the wild welter of Emacs. 
+
+Other helpful and informative sources that I have been learning from: 
+
++ [[https://www.youtube.com/playlist?list=PL5--8gKSku15e8lXf7aLICFmAHQVo0KXX][DT's Configuring Emacs]] from scratch YouTube series. I especially like that he is using the [[https://github.com/progfolio/elpaca][elpaca]] package manager. 
++ Apparently the maintainer of the =straight.el= package now recommends =elpaca.el=: https://www.reddit.com/r/emacs/comments/1dnvp9n/elpaca_vs_straightel_is_one_clearly_better_or_is/ (for which he is also the main dev). 
++ Given that, I would imagine his setup is worth looking at as well: [[https://github.com/progfolio/.emacs.d][progfolio's .emacs.d]].
++ Also, /Systems Crafters/ also has an [[https://www.youtube.com/playlist?list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ][Emacs from Scratch]] series. 
++ Also, Prot doesn't seem to use [[https://github.com/emacs-evil/evil][Evil]], which is a must for me so I will learn what I can from these other three setups. 
+
 
 *Last revised and exported on {{{latest-export-date}}} with a word
 count of {{{word-count}}}.*
