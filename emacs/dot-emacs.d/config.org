@@ -35,6 +35,61 @@
   (evil-mode 1))
 #+end_src
 
+* which-key
+
+#+begin_src emacs-lisp
+(use-package which-key
+  :init
+  (setq which-key-idle-delay 0.8)  ;; delay in seconds before popup
+  :config
+  (which-key-mode))
+#+end_src
+
+#+begin_src emacs-lisp
+(setq which-key-max-description-length 50)
+(setq which-key-separator " → " )
+(setq which-key-prefix-prefix "+")
+(setq which-key-allow-imprecise-window-fit t)
+#+end_src
+
+** which-key appearance (customized for ef-dream)
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'which-key
+  (set-face-attribute 'which-key-key-face nil :weight 'bold)
+  (set-face-attribute 'which-key-separator-face nil :foreground "gray60")
+  (set-face-attribute 'which-key-note-face nil :foreground "orchid")
+  (set-face-attribute 'which-key-command-description-face nil :foreground "light steel blue")
+  (set-face-attribute 'which-key-local-map-description-face nil :foreground "light salmon"))
+#+end_src
+
+* general.el — Leader Key and Keybindings
+
+#+begin_src emacs-lisp
+(use-package general
+  :demand t
+  :config
+  ;; Define the leader key definer
+  (general-create-definer my/leader-key
+    :keymaps '(normal visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+
+  ;; Set up leader keybindings
+  (my/leader-key
+    "f"  '(:ignore t :which-key "files")
+    "f f" '(find-file :which-key "find file")
+    "f r" '(recentf-open-files :which-key "recent files")
+    "b"  '(:ignore t :which-key "buffers")
+    "b b" '(switch-to-buffer :which-key "switch buffer")
+    "b k" '(kill-buffer :which-key "kill buffer")))
+#+end_src
+
+#+begin_src emacs-lisp
+(setq which-key-show-prefix 'top)
+#+end_src
+
+
 * Theme: ef-dream
 
 #+begin_src emacs-lisp
@@ -53,4 +108,5 @@
 (setq ring-bell-function 'ignore)
 (global-hl-line-mode 1)
 (global-display-line-numbers-mode 1)
+(prefer-coding-system 'utf-8)
 #+end_src
