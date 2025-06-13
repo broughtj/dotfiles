@@ -1,3 +1,10 @@
+# UPDATE: 06.12.2025.THU
+
+- I am wiping the slate clean and redo-ing my dotfiles
+- This dir is here for history. 
+- I am archiving these old files in case I want to look back at them for future reference. 
+
+
 ## To Instantiate Nix-Darwin
 
 ```{shell}

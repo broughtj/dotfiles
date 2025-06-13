@@ -1,0 +1,18 @@
+#+title: TJB's Emacs Configuration
+#+author: Tyler J. Brough 
+#+email: broughtj@gmail.com
+#+language: en
+#+options: ':t toc:nil num:t author:t email:t
+#+startup: content indent
+#+macro: latest-export-date (eval (format-time-string "%F %T %z"))
+#+macro: word-count (eval (count-words (point-min) (point-max)))
+
+*Last revised and exported on {{{latest-export-date}}} with a word
+count of {{{word-count}}}.*
+
+* Where To Store the Configuration Files
+
+Emacs provides lots of possibilities, starting with where to put the main configuration file. In the interest of not overwhelming the user, I am being opinionated with certain choices: 
+
++ =~/.emacs.d/init.el= for your configuration files.
++ If there is an =~/.emacs= file on your system, make sure to delete it (or rename it if you about its contents). Otherwise, Emacs will prioritize that over your =~/.emacs.d/init.el=.
