@@ -85,6 +85,19 @@
     "b b" '(switch-to-buffer :which-key "switch buffer")
     "b k" '(kill-buffer :which-key "kill buffer")
 
+    ;; Dired 
+    "e" '(:ignore t :which-key "explorer")
+    "e d" '(dired :which-key "dired")
+
+    ;; LSP
+    "l" '(:ignore t :which-key "lsp")
+    "l r" '(lsp-rename :which-key "rename symbol")
+    "l a" '(lsp-execute-code-action :which-key "code action")
+    "l d" '(lsp-find-definition :which-key "go to def")
+    "l t" '(lsp-find-type-definition :which-key "type def")
+    "l i" '(lsp-find-implementation :which-key "implementation")
+    "l e" '(lsp-treemacs-errors-list :which-key "errors")
+
     ;; Toggles
     "t" '(:ignore t :which-key "toggles")
     "t l" '(display-line-numbers-mode :which-key "line numbers")
@@ -112,6 +125,65 @@
 #+end_src
 
 
+* Org
+
+** Enabling Table of Contents
+
+#+begin_src emacs-lisp :lexical t
+;; Org 
+
+(use-package toc-org
+    :commands toc-org-enable
+    :init (add-hook 'org-mode-hook 'toc-org-enable))
+#+end_src
+
+
+** Enabling Org Bullets
+
+Org-bullets gives us attractive bullets rather than asterisks.
+
+#+begin_src emacs-lisp :lexical t
+(add-hook 'org-mode-hook 'org-indent-mode)
+(use-package org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+end_src
+
+
+** Org Level Headers
+
+#+begin_src emacs-lisp
+;; (custom-set-faces
+;;  '(org-level-1 ((t (:inherit outline-1 :height 1.5))))
+;;  '(org-level-2 ((t (:inherit outline-2 :height 1.4))))
+;;  '(org-level-3 ((t (:inherit outline-3 :height 1.3))))
+;;  '(org-level-4 ((t (:inherit outline-4 :height 1.2))))
+;;  '(org-level-5 ((t (:inherit outline-5 :height 1.1))))
+;;  '(org-level-6 ((t (:inherit outline-5 :height 1.0))))
+;;  '(org-level-7 ((t (:inherit outline-5 :height 0.9)))))
+#+end_src
+
+** Source Code Block Tag Expansion
+
+Org-tempo is not a separate package but a module within org that can be enabled.  Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.  Other expansions available include:
+
+| Typing the below + TAB | Expands to ...                          |
+|------------------------+-----------------------------------------|
+| <a                     | '#+BEGIN_EXPORT ascii' … '#+END_EXPORT  |
+| <c                     | '#+BEGIN_CENTER' … '#+END_CENTER'       |
+| <C                     | '#+BEGIN_COMMENT' … '#+END_COMMENT'     |
+| <e                     | '#+BEGIN_EXAMPLE' … '#+END_EXAMPLE'     |
+| <E                     | '#+BEGIN_EXPORT' … '#+END_EXPORT'       |
+| <h                     | '#+BEGIN_EXPORT html' … '#+END_EXPORT'  |
+| <l                     | '#+BEGIN_EXPORT latex' … '#+END_EXPORT' |
+| <q                     | '#+BEGIN_QUOTE' … '#+END_QUOTE'         |
+| <s                     | '#+BEGIN_SRC' … '#+END_SRC'             |
+| <v                     | '#+BEGIN_VERSE' … '#+END_VERSE'         |
+
+#+begin_src emacs-lisp 
+(require 'org-tempo)
+#+end_src
+
+
 * Magit 
 
 * Git: Magit
@@ -121,12 +193,13 @@
   :commands (magit-status))
 #+end_src
 
-* Theme: ef-dream
-
+*
+Theme: ef-melissa-dark
 #+begin_src emacs-lisp :lexical t
 (use-package ef-themes
   :config
-  (load-theme 'ef-dark :no-confirm))
+  ;(load-theme 'ef-dark :no-confirm))
+  (load-theme 'ef-melissa-dark :no-confirm))
 #+end_src
 
 * UI Tweaks
@@ -204,3 +277,75 @@
       read-file-name-completion-ignore-case t
       read-buffer-completion-ignore-case t)
 #+end_src
+
+
+* Language Server Protocol (LSP) Support
+
+#+begin_src emacs-lisp :lexical t
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :hook ((python-mode . lsp-deferred)
+         (julia-mode . lsp-deferred))
+  :init
+  (setq lsp-keymap-prefix "C-c l")  ;; optional, use `which-key` for discoverability
+  :config
+  (setq lsp-enable-symbol-highlighting t
+        lsp-enable-on-type-formatting nil
+        lsp-headerline-breadcrumb-enable t))
+
+(use-package lsp-ui
+  :after lsp-mode
+  :commands lsp-ui-mode
+  :config
+  (setq lsp-ui-doc-enable t
+        lsp-ui-doc-position 'at-point
+        lsp-ui-sideline-enable t
+        lsp-ui-sideline-show-hover t
+        lsp-ui-sideline-show-diagnostics t))
+#+end_src
+
+
+* Julia
+
+#+begin_src emacs-lisp :lexical t
+;;; Julia 
+
+;; julia-mode
+(use-package julia-mode
+  :mode "\\.jl\\'")
+
+;; julia: lsp support (ensure LanguageServer.jl is installed in Julia)
+(use-package lsp-julia
+  :after lsp-mode
+  :config
+  (setq lsp-julia-default-environment "~/.julia/environments/v1.11")) 
+
+;; org-babel for julia
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((julia . t)))
+
+(use-package ob-julia
+  :ensure nil ;; built-in if Org is recent
+  :after org)
+#+end_src
+
+
+* Modeline
+
+The modeline is the bottom status bar that appears in Emacs windows.  While you can create your own custom modeline, why go to the trouble when Doom Emacs already has a nice modeline package available.  For more information on what is available to configure in the Doom modeline, check out: [[https://github.com/seagle0128/doom-modeline][Doom Modeline]]
+
+#+begin_src emacs-lisp :lexical t
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1)
+  :config
+  (setq doom-modeline-height 15      ;; sets modeline height
+        doom-modeline-bar-width 5    ;; sets right bar width
+        doom-modeline-persp-name t   ;; adds perspective name to modeline
+        doom-modeline-persp-icon t)) ;; adds folder icon next to persp name
+#+end_src
+
+* Shells and Terminals 
+
+TODO: configure this bit! 
