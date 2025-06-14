@@ -69,20 +69,42 @@
 (use-package general
   :demand t
   :config
-  ;; Define the leader key definer
-  (general-create-definer my/leader-key
+  (general-create-definer tjb/leader-key
     :keymaps '(normal visual emacs)
     :prefix "SPC"
     :global-prefix "C-SPC")
 
-  ;; Set up leader keybindings
-  (my/leader-key
+  (tjb/leader-key
+    ;; Files
     "f"  '(:ignore t :which-key "files")
     "f f" '(find-file :which-key "find file")
     "f r" '(recentf-open-files :which-key "recent files")
+
+    ;; Buffers
     "b"  '(:ignore t :which-key "buffers")
     "b b" '(switch-to-buffer :which-key "switch buffer")
-    "b k" '(kill-buffer :which-key "kill buffer")))
+    "b k" '(kill-buffer :which-key "kill buffer")
+
+    ;; Toggles
+    "t" '(:ignore t :which-key "toggles")
+    "t l" '(display-line-numbers-mode :which-key "line numbers")
+    "t t" '(visual-line-mode :which-key "soft wrap lines")
+    "t v" '(variable-pitch-mode :which-key "variable-pitch mode")
+
+    ;; Windows
+    "w" '(:ignore t :which-key "windows")
+    "w v" '(split-window-right :which-key "split vertically")
+    "w s" '(split-window-below :which-key "split horizontally")
+    "w d" '(delete-window :which-key "delete window")
+    "w o" '(delete-other-windows :which-key "delete others")
+    "w h" '(windmove-left :which-key "move left")
+    "w l" '(windmove-right :which-key "move right")
+    "w j" '(windmove-down :which-key "move down")
+    "w k" '(windmove-up :which-key "move up")
+
+    ;; Git (Magit)
+    "g" '(:ignore t :which-key "git")
+    "g g" '(magit-status :which-key "status")))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -90,9 +112,18 @@
 #+end_src
 
 
+* Magit 
+
+* Git: Magit
+
+#+begin_src emacs-lisp :lexical t
+(use-package magit
+  :commands (magit-status))
+#+end_src
+
 * Theme: ef-dream
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :lexical t
 (use-package ef-themes
   :config
   (load-theme 'ef-dark :no-confirm))
@@ -109,4 +140,67 @@
 (global-hl-line-mode 1)
 (global-display-line-numbers-mode 1)
 (prefer-coding-system 'utf-8)
+#+end_src
+
+
+
+* Modern Minibuffer Completion Stack
+
+#+begin_src emacs-lisp :lexical t
+;; Vertico for vertical minibuffer completion UI
+(use-package vertico
+  :init
+  (vertico-mode))
+
+;; Orderless for flexible matching (e.g. "f b" matches "find-buffer")
+(use-package orderless
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion)))))
+
+;; Marginalia for inline annotations (buffers, commands, etc.)
+(use-package marginalia
+  :init
+  (marginalia-mode))
+
+;; Consult for better M-x, buffer switching, grep, etc.
+(use-package consult
+  :bind
+  (("C-s" . consult-line)
+   ("C-x b" . consult-buffer)
+   ("M-y" . consult-yank-pop)))
+
+;; Embark: minibuffer actions menu
+(use-package embark
+  :bind
+  (("C-." . embark-act)         ;; alternative to right-click
+   ("C-;" . embark-dwim)        ;; smarter default action
+   ("C-h B" . embark-bindings)) ;; describe-bindings alternative
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command))
+
+;; Optional: combine embark + consult
+(use-package embark-consult
+  :after (embark consult))
+
+;; Corfu: popup in-buffer completions
+(use-package corfu
+  :init
+  (global-corfu-mode)
+  :custom
+  (corfu-auto t)
+  (corfu-cycle t)
+  (corfu-preview-current nil))
+
+;; Optional: add icons to completion popup (requires nerd-icons)
+;; (use-package nerd-icons-corfu
+;;   :after corfu
+;;   :init (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+#+end_src
+
+
+#+begin_src emacs-lisp :lexical t
+(setq completion-ignore-case t
+      read-file-name-completion-ignore-case t
+      read-buffer-completion-ignore-case t)
 #+end_src
