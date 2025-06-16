@@ -9,3 +9,6 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (setq ring-bell-function 'ignore)
+
+;; Turn off native compilation for now
+(setq native-comp-deferred-compilation nil)

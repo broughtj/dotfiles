@@ -1,4 +1,4 @@
-#+TITLE: Emacs Config
+#+TITLE: TJB's Literate Emacs Config
 #+PROPERTY: header-args:emacs-lisp :tangle config.el :mkdirp yes
 #+STARTUP: content
 
@@ -23,6 +23,17 @@
 (add-hook 'org-mode-hook
           (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config nil t)))
 #+end_src
+
+* Native Compilation
+
+TODO: Figure out why this is causing problems! Turn it off for now to prevent a billion warning messages.
+
+Update: It's not working!
+
+#+begin_src emacs-lisp
+(setq native-comp-speed -1)  ; Disable native compilation
+#+end_src
+
 
 * Evil Mode
 
@@ -52,7 +63,7 @@
 (setq which-key-allow-imprecise-window-fit t)
 #+end_src
 
-** which-key appearance (customized for ef-dream)
+** Which-key appearance (customized for ef-dream)
 
 #+begin_src emacs-lisp
 (with-eval-after-load 'which-key
@@ -66,58 +77,69 @@
 * general.el — Leader Key and Keybindings
 
 #+begin_src emacs-lisp
-(use-package general
-  :demand t
-  :config
-  (general-create-definer tjb/leader-key
-    :keymaps '(normal visual emacs)
-    :prefix "SPC"
-    :global-prefix "C-SPC")
+  (use-package general
+    :demand t
+    :config
+    (general-create-definer tjb/leader-key
+      :keymaps '(normal visual emacs)
+      :prefix "SPC"
+      :global-prefix "C-SPC")
 
-  (tjb/leader-key
-    ;; Files
-    "f"  '(:ignore t :which-key "files")
-    "f f" '(find-file :which-key "find file")
-    "f r" '(recentf-open-files :which-key "recent files")
+    (tjb/leader-key
+      ;; Files
+      "f"  '(:ignore t :which-key "files")
+      "f f" '(find-file :which-key "find file")
+      "f r" '(recentf-open-files :which-key "recent files")
 
-    ;; Buffers
-    "b"  '(:ignore t :which-key "buffers")
-    "b b" '(switch-to-buffer :which-key "switch buffer")
-    "b k" '(kill-buffer :which-key "kill buffer")
+      ;; Buffers
+      "b"  '(:ignore t :which-key "buffers")
+      "b b" '(switch-to-buffer :which-key "switch buffer")
+      "b k" '(kill-buffer :which-key "kill buffer")
 
-    ;; Dired 
-    "e" '(:ignore t :which-key "explorer")
-    "e d" '(dired :which-key "dired")
+      ;; Dired 
+      "e" '(:ignore t :which-key "explorer")
+      "e d" '(dired :which-key "dired")
 
-    ;; LSP
-    "l" '(:ignore t :which-key "lsp")
-    "l r" '(lsp-rename :which-key "rename symbol")
-    "l a" '(lsp-execute-code-action :which-key "code action")
-    "l d" '(lsp-find-definition :which-key "go to def")
-    "l t" '(lsp-find-type-definition :which-key "type def")
-    "l i" '(lsp-find-implementation :which-key "implementation")
-    "l e" '(lsp-treemacs-errors-list :which-key "errors")
+      ;; LSP
+      "l" '(:ignore t :which-key "lsp")
+      "l r" '(lsp-rename :which-key "rename symbol")
+      "l a" '(lsp-execute-code-action :which-key "code action")
+      "l d" '(lsp-find-definition :which-key "go to def")
+      "l t" '(lsp-find-type-definition :which-key "type def")
+      "l i" '(lsp-find-implementation :which-key "implementation")
+      "l e" '(lsp-treemacs-errors-list :which-key "errors")
 
-    ;; Toggles
-    "t" '(:ignore t :which-key "toggles")
-    "t l" '(display-line-numbers-mode :which-key "line numbers")
-    "t t" '(visual-line-mode :which-key "soft wrap lines")
-    "t v" '(variable-pitch-mode :which-key "variable-pitch mode")
+      ;; Org 
+      "m" '(:ignore t :wk "Org")
+      "m a" '(org-agenda :wk "Org agenda")
+      "m e" '(org-export-dispatch :wk "Org export dispatch")
+      "m i" '(org-toggle-item :wk "Org toggle item")
+      "m t" '(org-todo :wk "Org todo")
+      "m B" '(org-babel-tangle :wk "Org babel tangle")
+      "m T" '(org-todo-list :wk "Org todo list")
 
-    ;; Windows
-    "w" '(:ignore t :which-key "windows")
-    "w v" '(split-window-right :which-key "split vertically")
-    "w s" '(split-window-below :which-key "split horizontally")
-    "w d" '(delete-window :which-key "delete window")
-    "w o" '(delete-other-windows :which-key "delete others")
-    "w h" '(windmove-left :which-key "move left")
-    "w l" '(windmove-right :which-key "move right")
-    "w j" '(windmove-down :which-key "move down")
-    "w k" '(windmove-up :which-key "move up")
 
-    ;; Git (Magit)
-    "g" '(:ignore t :which-key "git")
-    "g g" '(magit-status :which-key "status")))
+      ;; Toggles
+      "t" '(:ignore t :which-key "toggles")
+      "t l" '(display-line-numbers-mode :which-key "line numbers")
+      "t t" '(visual-line-mode :which-key "soft wrap lines")
+      "t v" '(vterm-toggle :which-key "toggle vterm")
+
+
+      ;; Windows
+      "w" '(:ignore t :which-key "windows")
+      "w v" '(split-window-right :which-key "split vertically")
+      "w s" '(split-window-below :which-key "split horizontally")
+      "w d" '(delete-window :which-key "delete window")
+      "w o" '(delete-other-windows :which-key "delete others")
+      "w h" '(windmove-left :which-key "move left")
+      "w l" '(windmove-right :which-key "move right")
+      "w j" '(windmove-down :which-key "move down")
+      "w k" '(windmove-up :which-key "move up")
+
+      ;; Git (Magit)
+      "g" '(:ignore t :which-key "git")
+      "g g" '(magit-status :which-key "status")))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -189,13 +211,33 @@ Org-tempo is not a separate package but a module within org that can be enabled.
 * Git: Magit
 
 #+begin_src emacs-lisp :lexical t
-(use-package magit
-  :commands (magit-status))
+  (use-package magit
+    :ensure t
+    :commands (magit-status))
 #+end_src
 
-*
-Theme: ef-melissa-dark
+Require ~transient~
+
 #+begin_src emacs-lisp :lexical t
+(use-package transient
+  :ensure t)
+#+end_src
+
+* Theme 
+
+#+begin_src emacs-lisp :lexical t
+;; Get the standard themes
+(use-package standard-themes)
+
+
+;; Get modus themes 
+(use-package modus-themes)
+
+
+;; Get doom themes
+(use-package doom-themes)
+
+;; Prot's ef-melissa-dark 
 (use-package ef-themes
   :config
   ;(load-theme 'ef-dark :no-confirm))
@@ -340,12 +382,69 @@ The modeline is the bottom status bar that appears in Emacs windows.  While you 
   :ensure t
   :init (doom-modeline-mode 1)
   :config
-  (setq doom-modeline-height 15      ;; sets modeline height
+  (setq doom-modeline-height 25      ;; sets modeline height
         doom-modeline-bar-width 5    ;; sets right bar width
         doom-modeline-persp-name t   ;; adds perspective name to modeline
         doom-modeline-persp-icon t)) ;; adds folder icon next to persp name
 #+end_src
 
+
 * Shells and Terminals 
 
 TODO: configure this bit! 
+
+** Vterm
+
+Vterm is a terminal emulator within Emacs.  The 'shell-file-name' setting sets the shell to be used in M-x shell, M-x term, M-x ansi-term and M-x vterm.  By default, the shell is set to 'fish' but could change it to 'bash' or 'zsh' if you prefer.
+
+
+#+begin_src emacs-lisp
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package vterm
+  :ensure t
+  :config
+  (setq shell-file-name "/bin/sh"
+        vterm-max-scrollback 5000))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package vterm-toggle
+  :after vterm
+  :config
+  ;; When running programs in Vterm and in 'normal' mode, make sure that ESC
+  ;; kills the program as it would in most standard terminal programs.
+  (evil-define-key 'normal vterm-mode-map (kbd "<escape>") 'vterm--self-insert)
+  (setq vterm-toggle-fullscreen-p nil)
+  (setq vterm-toggle-scope 'project)
+  (add-to-list 'display-buffer-alist
+               '((lambda (buffer-or-name _)
+                     (let ((buffer (get-buffer buffer-or-name)))
+                       (with-current-buffer buffer
+                         (or (equal major-mode 'vterm-mode)
+                             (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
+                  (display-buffer-reuse-window display-buffer-at-bottom)
+                  ;;(display-buffer-reuse-window display-buffer-in-direction)
+                  ;;display-buffer-in-direction/direction/dedicated is added in emacs27
+                  ;;(direction . bottom)
+                  ;;(dedicated . t) ;dedicated is supported in emacs27
+                  (reusable-frames . visible)
+                  (window-height . 0.4))))
+#+end_src
+
+
+* Transparency
+
+With Emacs version 29, true transparency has been added.  I have turned transparency off by setting the alpha to '100'.  If you want some slight transparency, try setting alpha to '90'.  Of course, if you set alpha to '0', the background of Emacs would completely transparent.
+
+TODO: Fix this. It isn't working (though not sure I even want it!)
+
+#+begin_src emacs-lisp
+;;(add-to-list 'default-frame-alist '(alpha-background . 50)) ; For all new frames henceforth
+#+begin_src 

@@ -1,7 +1,12 @@
 ;; -*- lexical-binding: t; -*-
+
+
+;; Put custom jike in standalone file
+
 (setq custom-file (locate-user-emacs-file "custom.el"))
 (when (file-exists-p custom-file)
   (load custom-file))
+
 
 ;; Bootstrap Elpaca
 
@@ -43,6 +48,12 @@
     (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
+
+
+;; Make ESC quit prompts
+
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
 
 ;; Load the generated config.el from literate config
 
