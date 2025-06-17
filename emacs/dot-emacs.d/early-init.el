@@ -12,3 +12,7 @@
 
 ;; Turn off native compilation for now
 (setq native-comp-deferred-compilation nil)
+
+;; Turn off the startup message
+(setq inhibit-startup-message t)
+

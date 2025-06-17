@@ -1,6 +1,7 @@
 #+TITLE: TJB's Literate Emacs Config
 #+PROPERTY: header-args:emacs-lisp :tangle config.el :mkdirp yes
-#+STARTUP: content
+#+STARTUP: showeverything
+
 
 * Bootstrap use-package with elpaca
 
@@ -11,6 +12,39 @@
 ;; Install other packages automatically by default
 (setq use-package-always-ensure t)
 #+end_src
+
+
+* Sane Defaults
+
+** Spaces > tabs?
+
+#+begin_src emacs-lisp
+(setq-default indent-tabs-mode nil)
+#+end_src
+
+** Native compilation
+
+TODO: Figure out why this is causing problems! Turn it off for now to prevent a billion warning messages.
+
+Update: It's not working!
+
+#+begin_src emacs-lisp
+(setq native-comp-speed -1)  ; Disable native compilation
+#+end_src
+
+** UI Tweaks 
+
+#+begin_src emacs-lisp
+;; Already set in early-init.el for startup performance
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+(setq ring-bell-function 'ignore)
+(global-hl-line-mode 1)
+(global-display-line-numbers-mode 1)
+(prefer-coding-system 'utf-8)
+#+end_src
+
 
 * Auto-tangle on save
 
@@ -24,14 +58,15 @@
           (lambda () (add-hook 'after-save-hook #'my/org-babel-tangle-config nil t)))
 #+end_src
 
-* Native Compilation
 
-TODO: Figure out why this is causing problems! Turn it off for now to prevent a billion warning messages.
+* Hot Reload
 
-Update: It's not working!
+I make a ton of changes of my =init-file=. I want to be able to do a hot reload. 
 
-#+begin_src emacs-lisp
-(setq native-comp-speed -1)  ; Disable native compilation
+#+begin_src 
+;; Hot reload from init-file
+
+(global-set-key (kbd "C-c r") (lambda () (interactive) (load-file user-init-file)))
 #+end_src
 
 
@@ -45,6 +80,39 @@ Update: It's not working!
   :config
   (evil-mode 1))
 #+end_src
+
+
+* Neotree
+
+Neotree is a file tree viewer.  When you open neotree, it jumps to the current file thanks to neo-smart-open.  The neo-window-fixed-size setting makes the neotree width be adjustable.  NeoTree provides following themes: classic, ascii, arrow, icons, and nerd.  Theme can be config'd by setting "two" themes for neo-theme: one for the GUI and one for the terminal.  I like to use 'SPC t' for 'toggle' keybindings, so I have used 'SPC t n' for toggle-neotree.
+
+| COMMAND        | DESCRIPTION                 | KEYBINDING |
+|----------------+-----------------------------+------------|
+| neotree-toggle | /Toggle neotree/            | SPC t n    |
+| neotree-dir    | /Open directory in neotree/ | SPC d n    |
+
+
+#+begin_src emacs-lisp
+;; Neotree
+
+(use-package neotree
+  :config
+  (setq neo-smart-open t
+        neo-show-hidden-files t
+        neo-window-width 55
+        neo-window-fixed-size nil
+        inhibit-compacting-font-caches t
+        projectile-switch-project-action 'neotree-projectile-action) 
+        ;; truncate long file names in neotree
+        (add-hook 'neo-after-create-hook
+           #'(lambda (_)
+               (with-current-buffer (get-buffer neo-buffer-name)
+                 (setq truncate-lines t)
+                 (setq word-wrap nil)
+                 (make-local-variable 'auto-hscroll-mode)
+                 (setq auto-hscroll-mode nil)))))
+#+end_src
+
 
 * which-key
 
@@ -74,72 +142,85 @@ Update: It's not working!
   (set-face-attribute 'which-key-local-map-description-face nil :foreground "light salmon"))
 #+end_src
 
+
 * general.el — Leader Key and Keybindings
 
 #+begin_src emacs-lisp
-  (use-package general
-    :demand t
-    :config
-    (general-create-definer tjb/leader-key
-      :keymaps '(normal visual emacs)
-      :prefix "SPC"
-      :global-prefix "C-SPC")
+(use-package general
+  :demand t
+  :config
+  (general-create-definer tjb/leader-key
+    :keymaps '(normal visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
 
-    (tjb/leader-key
-      ;; Files
-      "f"  '(:ignore t :which-key "files")
-      "f f" '(find-file :which-key "find file")
-      "f r" '(recentf-open-files :which-key "recent files")
+  (tjb/leader-key
+    ;; Files
+    "f"  '(:ignore t :which-key "files")
+    "f f" '(find-file :which-key "find file")
+    "f r" '(recentf-open-files :which-key "recent files")
 
-      ;; Buffers
-      "b"  '(:ignore t :which-key "buffers")
-      "b b" '(switch-to-buffer :which-key "switch buffer")
-      "b k" '(kill-buffer :which-key "kill buffer")
+    ;; Buffers
+    "b"  '(:ignore t :which-key "buffers")
+    "b b" '(switch-to-buffer :which-key "switch buffer")
+    "b k" '(kill-buffer :which-key "kill buffer")
 
-      ;; Dired 
-      "e" '(:ignore t :which-key "explorer")
-      "e d" '(dired :which-key "dired")
+    ;; Dired 
+    "d" '(:ignore t :which-key "Dired")
+    "d d" '(dired :which-key "Open dired")
+    "d j" '(dired-jump :which-key "Dired jump to current")
+    "d n" '(neotree-dir :which-key "Open directory in neotree")
 
-      ;; LSP
-      "l" '(:ignore t :which-key "lsp")
-      "l r" '(lsp-rename :which-key "rename symbol")
-      "l a" '(lsp-execute-code-action :which-key "code action")
-      "l d" '(lsp-find-definition :which-key "go to def")
-      "l t" '(lsp-find-type-definition :which-key "type def")
-      "l i" '(lsp-find-implementation :which-key "implementation")
-      "l e" '(lsp-treemacs-errors-list :which-key "errors")
+    ;; Eshell
+    "e" '(:ignore t :which-key "Eshell")
+    "e s" '(eshell :which-key "Eshell")
 
-      ;; Org 
-      "m" '(:ignore t :wk "Org")
-      "m a" '(org-agenda :wk "Org agenda")
-      "m e" '(org-export-dispatch :wk "Org export dispatch")
-      "m i" '(org-toggle-item :wk "Org toggle item")
-      "m t" '(org-todo :wk "Org todo")
-      "m B" '(org-babel-tangle :wk "Org babel tangle")
-      "m T" '(org-todo-list :wk "Org todo list")
+    ;; gptel
+    "g" '(:ignore t :which-key "gptel")
+    "g s" '(gptel-send :which-key "send")
+    "g a" '(gptel-abort :which-key "abort")
+    "g M" '(gptel-menu :which-key "menu") 
+    
+    ;; LSP
+    "l" '(:ignore t :which-key "lsp")
+    "l r" '(lsp-rename :which-key "rename symbol")
+    "l a" '(lsp-execute-code-action :which-key "code action")
+    "l d" '(lsp-find-definition :which-key "go to def")
+    "l t" '(lsp-find-type-definition :which-key "type def")
+    "l i" '(lsp-find-implementation :which-key "implementation")
+    "l e" '(lsp-treemacs-errors-list :which-key "errors")
 
+    ;; Org 
+    "m" '(:ignore t :which-key "Org")
+    "m a" '(org-agenda :which-key "Org agenda")
+    "m B" '(org-babel-tangle :which-key "Org babel tangle")
+    "m e" '(org-export-dispatch :which-key "Org export dispatch")
+    "m i" '(org-toggle-item :which-key "Org toggle item")
+    "t n" '(neotree-toggle :which-key "Toggle neotree file viewer")
+    "m t" '(org-todo :which-key "Org todo")
+    "m T" '(org-todo-list :which-key "Org todo list")
 
-      ;; Toggles
-      "t" '(:ignore t :which-key "toggles")
-      "t l" '(display-line-numbers-mode :which-key "line numbers")
-      "t t" '(visual-line-mode :which-key "soft wrap lines")
-      "t v" '(vterm-toggle :which-key "toggle vterm")
+    ;; Toggles
+    "t" '(:ignore t :which-key "toggles")
+    "t e" '(eshell-toggle :which-key "Toggle eshell")
+    "t l" '(display-line-numbers-mode :which-key "line numbers")
+    "t t" '(visual-line-mode :which-key "soft wrap lines")
+    "t v" '(vterm-toggle :which-key "toggle vterm")
 
+    ;; Windows
+    "w" '(:ignore t :which-key "windows")
+    "w v" '(split-window-right :which-key "split vertically")
+    "w s" '(split-window-below :which-key "split horizontally")
+    "w d" '(delete-window :which-key "delete window")
+    "w o" '(delete-other-windows :which-key "delete others")
+    "w h" '(windmove-left :which-key "move left")
+    "w l" '(windmove-right :which-key "move right")
+    "w j" '(windmove-down :which-key "move down")
+    "w k" '(windmove-up :which-key "move up")
 
-      ;; Windows
-      "w" '(:ignore t :which-key "windows")
-      "w v" '(split-window-right :which-key "split vertically")
-      "w s" '(split-window-below :which-key "split horizontally")
-      "w d" '(delete-window :which-key "delete window")
-      "w o" '(delete-other-windows :which-key "delete others")
-      "w h" '(windmove-left :which-key "move left")
-      "w l" '(windmove-right :which-key "move right")
-      "w j" '(windmove-down :which-key "move down")
-      "w k" '(windmove-up :which-key "move up")
-
-      ;; Git (Magit)
-      "g" '(:ignore t :which-key "git")
-      "g g" '(magit-status :which-key "status")))
+    ;; Git (Magit)
+    "g" '(:ignore t :which-key "git")
+    "g g" '(magit-status :which-key "status")))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -184,6 +265,7 @@ Org-bullets gives us attractive bullets rather than asterisks.
 ;;  '(org-level-7 ((t (:inherit outline-5 :height 0.9)))))
 #+end_src
 
+
 ** Source Code Block Tag Expansion
 
 Org-tempo is not a separate package but a module within org that can be enabled.  Org-tempo allows for '<s' followed by TAB to expand to a begin_src tag.  Other expansions available include:
@@ -206,22 +288,29 @@ Org-tempo is not a separate package but a module within org that can be enabled.
 #+end_src
 
 
-* Magit 
+** Do not indent code blocks!
 
-* Git: Magit
-
-#+begin_src emacs-lisp :lexical t
-  (use-package magit
-    :ensure t
-    :commands (magit-status))
+#+begin_src emacs-lisp
+(setq org-src-preserve-indentation nil
+    org-edit-src-content-indentation 0) 
 #+end_src
 
-Require ~transient~
+
+* Git Magit
+
+#+begin_src emacs-lisp :lexical t
+(use-package magit
+  :ensure t
+  :commands (magit-status))
+#+end_src
+
+Require =transient=
 
 #+begin_src emacs-lisp :lexical t
 (use-package transient
   :ensure t)
 #+end_src
+
 
 * Theme 
 
@@ -243,20 +332,6 @@ Require ~transient~
   ;(load-theme 'ef-dark :no-confirm))
   (load-theme 'ef-melissa-dark :no-confirm))
 #+end_src
-
-* UI Tweaks
-
-#+begin_src emacs-lisp
-;; Already set in early-init.el for startup performance
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-(setq ring-bell-function 'ignore)
-(global-hl-line-mode 1)
-(global-display-line-numbers-mode 1)
-(prefer-coding-system 'utf-8)
-#+end_src
-
 
 
 * Modern Minibuffer Completion Stack
@@ -391,9 +466,41 @@ The modeline is the bottom status bar that appears in Emacs windows.  While you 
 
 * Shells and Terminals 
 
-TODO: configure this bit! 
+** Eshell
+
+Eshell is an Emacs 'shell' that is written in Elisp.
+
+#+begin_src emacs-lisp
+(use-package eshell-toggle
+  :custom
+  (eshell-toggle-size-fraction 3)
+  ;;(eshell-toggle-use-projectile-root t)
+  (eshell-toggle-run-command nil)
+  (eshell-toggle-init-function #'eshell-toggle-init-ansi-term))
+
+  (use-package eshell-syntax-highlighting
+    :after esh-mode
+    :config
+    (eshell-syntax-highlighting-global-mode +1))
+
+  ;; eshell-syntax-highlighting -- adds fish/zsh-like syntax highlighting.
+  ;; eshell-rc-script -- your profile for eshell; like a bashrc for eshell.
+  ;; eshell-aliases-file -- sets an aliases file for the eshell.
+
+  (setq eshell-rc-script (concat user-emacs-directory "eshell/profile")
+        eshell-aliases-file (concat user-emacs-directory "eshell/aliases")
+        eshell-history-size 5000
+        eshell-buffer-maximum-lines 5000
+        eshell-hist-ignoredups t
+        eshell-scroll-to-bottom-on-input t
+        eshell-destroy-buffer-when-process-dies t
+        eshell-visual-commands'("bash" "fish" "htop" "ssh" "top" "zsh"))
+#+end_src
+
 
 ** Vterm
+
+TODO: configure this a bit! 
 
 Vterm is a terminal emulator within Emacs.  The 'shell-file-name' setting sets the shell to be used in M-x shell, M-x term, M-x ansi-term and M-x vterm.  By default, the shell is set to 'fish' but could change it to 'bash' or 'zsh' if you prefer.
 
@@ -446,5 +553,22 @@ With Emacs version 29, true transparency has been added.  I have turned transpar
 TODO: Fix this. It isn't working (though not sure I even want it!)
 
 #+begin_src emacs-lisp
+
 ;;(add-to-list 'default-frame-alist '(alpha-background . 50)) ; For all new frames henceforth
-#+begin_src 
+
+#+end_src 
+
+
+* gptel
+
+Holy crap! Check this out: https://www.youtube.com/watch?v=bsRnh_brggM
+
+#+begin_src emacs-lisp
+(use-package gptel
+  :ensure (:host github :repo "karthink/gptel")
+  :config
+  (setq gptel-api-key
+        (auth-source-pick-first-password
+         :host "api.openai.com"
+         :user "apikey")))
+#+end_src
