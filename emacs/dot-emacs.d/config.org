@@ -72,13 +72,29 @@ I make a ton of changes of my =init-file=. I want to be able to do a hot reload.
 
 * Evil Mode
 
+It's not /evil/, it's just misunderstood! 
+
 #+begin_src emacs-lisp
+;; Evil
+
 (use-package evil
   :init
   (setq evil-want-integration t
         evil-want-keybinding nil)
   :config
   (evil-mode 1))
+
+(use-package evil-collection
+  :after evil
+  :config
+  ;; Do not uncomment this unless you want to specify each and every mode
+  ;; that evil-collection should works with.  The following line is here 
+  ;; for documentation purposes in case you need it.  
+  ;; (setq evil-collection-mode-list '(calendar dashboard dired ediff info magit ibuffer))
+  (add-to-list 'evil-collection-mode-list 'help) ;; evilify help mode
+  (evil-collection-init))
+
+(use-package evil-tutor)
 #+end_src
 
 
@@ -200,10 +216,18 @@ Neotree is a file tree viewer.  When you open neotree, it jumps to the current f
     "m t" '(org-todo :which-key "Org todo")
     "m T" '(org-todo-list :which-key "Org todo list")
 
+
+    ;; Orgroam
+    "r" '(:ignore t :which-key "Orgroam")
+    "r f" '(org-roam-node-find :which-key "Orgroam find node")
+    "r i" '(org-roam-node-insert :which-key "Orgroam insert node")
+    "r t" '(org-roam-dailies-capture-today :which-key "Orgroam dailies capture today")
+
     ;; Toggles
     "t" '(:ignore t :which-key "toggles")
     "t e" '(eshell-toggle :which-key "Toggle eshell")
     "t l" '(display-line-numbers-mode :which-key "line numbers")
+    "t r" '(org-roam-buffer-toggle :which-key "Orgroam buffer toggle")
     "t t" '(visual-line-mode :which-key "soft wrap lines")
     "t v" '(vterm-toggle :which-key "toggle vterm")
 
@@ -291,8 +315,66 @@ Org-tempo is not a separate package but a module within org that can be enabled.
 ** Do not indent code blocks!
 
 #+begin_src emacs-lisp
+;; Don't indent code blocks automatically
+
 (setq org-src-preserve-indentation nil
     org-edit-src-content-indentation 0) 
+#+end_src
+
+
+** Habits
+
+#+begin_src emacs-lisp
+;; Habits
+
+(with-eval-after-load 'org
+  (add-to-list 'org-modules 'org-habit t))
+#+end_src
+
+
+** Global Bibliography
+
+#+begin_src emacs-lisp
+;; Globabl bibliography file
+
+(with-eval-after-load 'org
+  (require 'oc-basic))
+(setq org-cite-global-bibliography '("~/Dropbox/orgroam/biblio.bib"))
+#+end_src
+
+
+* Orgroam
+
+#+begin_src emacs-lisp :mkdirp yes
+;; Orgroam 
+
+(use-package org-roam
+  :ensure t
+  ;;:init
+  ;;(org-roam-v2-ack t)
+  :custom
+  (org-roam-v2-ack t)
+  (org-directory "~/Dropbox/org")
+  (org-roam-directory "~/Dropbox/orgroam/notes")
+  (org-roam-dailies-directory "~/Dropbox/orgroam/dailies")
+  ;; Set this above so don't need it here.
+  ;; (org-cite-global-bibliography '("~/Dropbox/orgroam/biblio.bib"))
+  (org-roam-completion-everywhere t)
+  (org-roam-capture-templates
+   '(("d" "default" plain
+       "%?" :target
+       (file+head "${slug}.org" "#+title: ${title}\n")
+       :unnarrowed t)))
+   ;; :bind (("C-c n l" . org-roam-buffer-toggle)
+   ;;        ("C-c n f" . org-roam-node-find)
+   ;;        ("C-c n i" . org-roam-node-insert)
+   ;;        ("C-c n t" . org-roam-dailies-capture-today)
+   ;;        ("C-c n a" . org-agenda)
+   ;;        ;; ("C-c n b" . org-iswitchb)
+   ;;        )
+   :config
+   (require 'oc-basic)
+   (org-roam-setup))
 #+end_src
 
 
