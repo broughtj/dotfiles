@@ -1,0 +1,120 @@
+#!/usr/bin/env lua
+
+-- Neovim Configuration Tangling Script
+-- Extracts code blocks from README.md and writes them to appropriate files
+
+local function read_file(path)
+    local file = io.open(path, "r")
+    if not file then
+        print("Error: Could not open " .. path)
+        return nil
+    end
+    local content = file:read("*all")
+    file:close()
+    return content
+end
+
+local function write_file(path, content)
+    -- Create directory if it doesn't exist
+    local dir = path:match("(.*/)")
+    if dir then
+        os.execute("mkdir -p " .. dir)
+    end
+    
+    local file = io.open(path, "w")
+    if not file then
+        print("Error: Could not write to " .. path)
+        return false
+    end
+    file:write(content)
+    file:close()
+    return true
+end
+
+local function extract_filename(line)
+    -- Look for "-- file: path/to/file.lua" pattern
+    local filename = line:match("^%s*%-%-%s*file:%s*(.+)$")
+    if filename then
+        return filename:gsub("^%s*", ""):gsub("%s*$", "") -- trim whitespace
+    end
+    return nil
+end
+
+local function tangle_markdown(content)
+    local lines = {}
+    -- Split on newlines but preserve empty lines
+    for line in (content .. "\n"):gmatch("([^\r\n]*)\r?\n") do
+        table.insert(lines, line)
+    end
+    
+    local files = {}
+    local current_file = nil
+    local current_content = {}
+    local in_lua_block = false
+    
+    for i, line in ipairs(lines) do
+        -- Check for lua code block start
+        if line:match("^```lua") then
+            in_lua_block = true
+            current_content = {}
+        -- Check for code block end
+        elseif line:match("^```") and in_lua_block then
+            in_lua_block = false
+            if current_file then
+                -- Join content and store (preserve empty lines)
+                local content_str = table.concat(current_content, "\n")
+                if content_str:match("%S") then -- Only if has non-whitespace content
+                    files[current_file] = content_str
+                end
+                current_file = nil
+            end
+        -- Process content inside lua blocks
+        elseif in_lua_block then
+            -- Check if this line specifies a filename
+            local filename = extract_filename(line)
+            if filename then
+                current_file = filename
+            else
+                -- Add to current content (including empty lines)
+                table.insert(current_content, line)
+            end
+        end
+    end
+    
+    return files
+end
+
+local function main()
+    local readme_path = "README.md"
+    local content = read_file(readme_path)
+    
+    if not content then
+        print("Error: Could not read README.md")
+        return 1
+    end
+    
+    print("Tangling configuration from README.md...")
+    
+    local files = tangle_markdown(content)
+    
+    if next(files) == nil then
+        print("No files found to tangle. Make sure your code blocks have '-- file: path/to/file.lua' comments.")
+        return 1
+    end
+    
+    local success_count = 0
+    for filepath, file_content in pairs(files) do
+        if write_file(filepath, file_content) then
+            print("  ✓ " .. filepath)
+            success_count = success_count + 1
+        else
+            print("  ✗ " .. filepath)
+        end
+    end
+    
+    print(string.format("Tangled %d files successfully!", success_count))
+    return 0
+end
+
+-- Run the script
+os.exit(main())
