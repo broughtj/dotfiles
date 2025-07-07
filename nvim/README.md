@@ -1,6 +1,6 @@
 # My Neovim Configuration
 
-This is a literate configuration for Neovim. Run `lua tangle.lua` to extract the configuration files.
+This is a literate configuration for Neovim. Run `make tangle` to extract the configuration files.
 
 ## Initialization
 
