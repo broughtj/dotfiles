@@ -93,7 +93,7 @@ local function main()
         return 1
     end
     
-    print("Tangling configuration from README.md...")
+    -- print("Tangling configuration from README.md...")
     
     local files = tangle_markdown(content)
     
