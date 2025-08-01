@@ -1,0 +1,31 @@
+# Ghostty Configuration
+
+# Font settings
+#font-family = "SF Mono"
+font-family = "Menlo"
+font-size = 16
+
+# Color scheme
+##theme = "Kanagawa Wave"
+##theme = "catppuccin-mocha"
+##theme = "GruvboxDark"
+theme = "GruvBoxDarkHard"
+background-opacity = 0.98
+
+# Window settings
+window-padding-x = 8
+window-padding-y = 8
+window-decoration = true
+
+# Cursor settings
+cursor-style = block
+cursor-style-blink = true
+
+# Shell integration
+shell-integration = zsh
+shell-integration-features = cursor,sudo,title
+
+# Miscellaneous
+macos-option-as-alt = true
+confirm-close-surface = false
+copy-on-select = false
