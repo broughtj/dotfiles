@@ -1,0 +1,24 @@
+---
+# {{STEM}} deck. ONE SOURCE, THREE OUTPUTS via the usu-slides Quarto extension
+# (_extensions/usu-slides, from github.com/broughtj/quarto-usu-slides): revealjs HTML,
+# Beamer PDF, Typst handout. Scaffolded by the /slides skill (~/.claude/skills/slides);
+# reference/conventions.md there has the rules. Portable constructs only: .columns/.column,
+# .fragment, callouts, blockquotes, tables, images, fenced code. {.smaller} only affects
+# HTML; pair it with a {=latex} \small block. Code on the slides is NOT executed; every
+# number quoted next to a code block is reproduced by check-{{STEM}}.jl.
+# Source: {{SOURCE_NOTE}}
+title: "{{TITLE}}"
+subtitle: "{{SUBTITLE}}"
+author: "{{AUTHOR}}"
+institute: |
+  {{COURSE}}\
+  {{INSTITUTE}}
+date: "{{DATE}}"
+format:
+  usu-slides-revealjs:
+    output-file: {{STEM}}.html
+  usu-slides-beamer:
+    output-file: {{STEM}}-beamer.pdf
+  usu-slides-typst:
+    output-file: {{STEM}}-handout.pdf
+---

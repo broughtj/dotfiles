@@ -1,0 +1,28 @@
+
+# ---- {{STEM}} deck (added by /slides) ---------------------------------------
+
+# {{STEM}} deck, all three outputs
+{{STEM}}: {{STEM}}-html {{STEM}}-beamer {{STEM}}-handout
+
+# {{STEM}}, revealjs HTML only
+{{STEM}}-html:
+    quarto render {{DIR}}/{{STEM}}.qmd --to usu-slides-revealjs
+
+# {{STEM}}, Beamer PDF only
+{{STEM}}-beamer:
+    quarto render {{DIR}}/{{STEM}}.qmd --to usu-slides-beamer
+
+# {{STEM}}, Typst handout only
+{{STEM}}-handout:
+    quarto render {{DIR}}/{{STEM}}.qmd --to usu-slides-typst
+
+# Rerun the Julia quoted on the {{STEM}} deck
+{{STEM}}-check:
+    julia {{DIR}}/check-{{STEM}}.jl
+
+# Contact sheet of the {{STEM}} Beamer deck at build/{{STEM}}-sheet.png
+{{STEM}}-sheet:
+    mkdir -p build
+    pdftoppm -png -r 40 {{DIR}}/{{STEM}}-beamer.pdf build/{{STEM}}-p
+    python3 ~/.claude/skills/slides/scripts/sheet.py build/{{STEM}}-sheet.png build/{{STEM}}-p-*.png
+    rm -f build/{{STEM}}-p-*.png

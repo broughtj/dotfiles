@@ -1,0 +1,112 @@
+# Course materials. One justfile for the whole repo, parameterized by file stem:
+# `just deck {{STEM}}`, `just note <stem>`. Scaffolded by the /slides skill (~/.claude/skills/slides).
+#
+#   notes/<stem>.qmd   → notes/<stem>.html, notes/<stem>.pdf        (HTML with live Julia; Typst PDF)
+#   {{DIR}}/<stem>.qmd  → {{DIR}}/<stem>.html                          (revealjs)
+#                        {{DIR}}/<stem>-beamer.pdf                    (Beamer, Metropolis, navy theme)
+#                        {{DIR}}/<stem>-handout.pdf                   (Typst handout)
+#   {{DIR}}/check-<stem>.jl   reruns the Julia quoted on a deck and compares every number
+#   code/<name>.jl           shared modules the notes `include` and the slides quote
+#
+# Notes execute Julia on the julia-1.12 Jupyter kernel (IJulia, Plots). Slides need only
+# Quarto + LuaLaTeX with Fira fonts; their theme is the usu-slides Quarto extension in
+# {{DIR}}/_extensions/broughtj/usu-slides (github.com/broughtj/quarto-usu-slides; `just theme`).
+# New decks are scaffolded by the /slides skill, which appends the stem to `decks` below.
+
+notes := ""
+decks := "{{STEM}}"
+
+# Render every note and every deck in every format (default)
+all: all-notes all-decks
+
+# Render every note listed in `notes`
+all-notes:
+    for n in {{notes}}; do just note $n; done
+
+# Render every deck listed in `decks`, all three formats
+all-decks:
+    for d in {{decks}}; do just deck $d; done
+
+# ---- Notes -------------------------------------------------------------------
+
+# One set of notes, HTML and PDF, e.g. `just note <stem>`
+note stem: (note-html stem) (note-pdf stem)
+
+# Notes, HTML only
+note-html stem:
+    quarto render notes/{{stem}}.qmd --to html
+
+# Notes, Typst PDF only
+note-pdf stem:
+    quarto render notes/{{stem}}.qmd --to typst
+
+# ---- Slides ------------------------------------------------------------------
+
+# One deck, all three outputs, e.g. `just deck {{STEM}}`
+deck stem: (deck-html stem) (deck-beamer stem) (deck-handout stem)
+
+# Deck, revealjs HTML only
+deck-html stem:
+    quarto render {{DIR}}/{{stem}}.qmd --to usu-slides-revealjs
+
+# Deck, Beamer PDF only
+deck-beamer stem:
+    quarto render {{DIR}}/{{stem}}.qmd --to usu-slides-beamer
+
+# Deck, Typst handout only
+deck-handout stem:
+    quarto render {{DIR}}/{{stem}}.qmd --to usu-slides-typst
+
+# Rerun every Julia snippet quoted on a deck and compare with the printed numbers
+check stem:
+    julia {{DIR}}/check-{{stem}}.jl
+
+# Run every deck's check script
+check-all:
+    for d in {{decks}}; do just check $d; done
+
+# Post-render checks on a deck: page counts, Beamer fonts, no external assets in the HTML
+verify stem:
+    @echo "--- beamer pages";  pdfinfo {{DIR}}/{{stem}}-beamer.pdf | grep Pages
+    @echo "--- beamer fonts (expect Fira Sans / Fira Mono / Latin Modern Math)"; pdffonts {{DIR}}/{{stem}}-beamer.pdf | awk 'NR>2{print $1}' | sed 's/^[A-Z]*+//' | sort -u
+    @echo "--- handout pages"; pdfinfo {{DIR}}/{{stem}}-handout.pdf | grep Pages
+    @echo "--- external src in html (expect none)"; grep -oE 'src="https?://[^"]+"' {{DIR}}/{{stem}}.html | sort -u || true
+
+# Rasterize Beamer pages to build/pg-N.png for a close look, e.g. `just page {{STEM}} 7` or `just page {{STEM}} 7 12`
+page stem from to="":
+    mkdir -p build
+    pdftoppm -png -r 110 -f {{from}} -l {{ if to == "" { from } else { to } }} {{DIR}}/{{stem}}-beamer.pdf build/pg
+    @ls build/pg-*.png
+
+# One-image contact sheet of a Beamer deck at build/<stem>-sheet.png
+sheet stem:
+    mkdir -p build
+    pdftoppm -png -r 40 {{DIR}}/{{stem}}-beamer.pdf build/{{stem}}-p
+    python3 ~/.claude/skills/{{DIR}}/scripts/sheet.py build/{{stem}}-sheet.png build/{{stem}}-p-*.png
+    rm -f build/{{stem}}-p-*.png
+
+# Live-reloading browser preview: `just preview deck {{STEM}}` or `just preview note <stem>`
+preview kind stem:
+    quarto preview {{ if kind == "note" { "notes" } else { "slides" } }}/{{stem}}.qmd --to {{ if kind == "note" { "html" } else { "usu-slides-revealjs" } }}
+
+# Install or update the usu-slides theme extension in {{DIR}}/
+theme:
+    cd {{DIR}} && (test -d _extensions/broughtj/usu-slides && quarto update broughtj/quarto-usu-slides --no-prompt || quarto add broughtj/quarto-usu-slides --no-prompt)
+
+# ---- Code --------------------------------------------------------------------
+
+# Run a standalone script from code/, e.g. `just run m2m`
+run script:
+    julia code/{{script}}.jl
+
+# ---- Housekeeping ------------------------------------------------------------
+
+# Remove rendered output and scratch files (sources and figures are kept)
+clean:
+    for n in {{notes}}; do rm -f notes/$n.html notes/$n.pdf; rm -rf notes/${n}_files; done
+    for d in {{decks}}; do rm -f {{DIR}}/$d.html {{DIR}}/$d-beamer.pdf {{DIR}}/$d-handout.pdf; rm -rf {{DIR}}/${d}_files; done
+    rm -rf build notes/.quarto {{DIR}}/.quarto .quarto
+
+# Show available recipes
+help:
+    @just --list
