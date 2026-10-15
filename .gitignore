@@ -18,3 +18,7 @@ dist/
 
 # Undo-tree save-files
 *.~undo-tree
+
+# Agent skills: local secrets and sync state
+skills/**/.env
+skills/**/.todoist-sync-state.json

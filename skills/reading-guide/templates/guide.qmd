@@ -1,0 +1,173 @@
+---
+title: "[SOURCE TITLE]"
+subtitle: "A Reading Guide to [AUTHOR] ([YEAR])"
+description: |
+  Reading notes on [AUTHOR], *[FULL TITLE]*
+  ([PUBLISHER OR JOURNAL, VOLUME, YEAR, PAGES]).
+date: last-modified
+lang: en
+format:
+  html:
+    # single self-contained .html — no sidecar _files/ directory to keep in sync
+    embed-resources: true
+    toc: true
+    toc-depth: 3
+    toc-expand: 2
+    toc-title: "On this page"
+    number-sections: true
+    anchor-sections: true
+    smooth-scroll: true
+    theme: cosmo
+    max-width: 54em
+    linestretch: 1.6
+    tbl-cap-location: top
+  pdf:
+    pdf-engine: xelatex
+    papersize: letter
+    geometry:
+      - margin=1.15in
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    colorlinks: true
+    linkcolor: RoyalBlue
+    # Palatino, Times New Roman, and Times all carry full polytonic Greek
+    # coverage on macOS; Georgia, Didot, and New York do NOT — swap with care.
+    # Display and inline math stay in the default TeX face (Latin Modern Math).
+    mainfont: "Palatino"
+    sansfont: "Helvetica"
+    monofont: "Menlo"
+    tbl-cap-location: top
+  docx:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+---
+
+# Before You Start {.unnumbered #sec-overview}
+
+<!-- If the source numbers its own sections, say so — Quarto's numbering will
+     match it, which is a real navigational aid. -->
+The numbered sections below correspond one-to-one with [AUTHOR]'s own §§1–N.
+Page numbers throughout are to the printed [article/chapter].
+
+::: {.callout-important title="The [paper/book]'s governing claim"}
+[The thesis, distilled to two to four lines. Not a quotation.]
+:::
+
+[One to three corollaries that carry the argumentative weight.]
+
+| § | Pages | Job |
+|---|---|-----|
+| **1. [Title]** | 000–000 | [What it does *for the thesis*, not what it says.] |
+
+: What each section does for the thesis {#tbl-arc}
+
+**The hinge.** [The joint the whole argument turns on, and which two sections to
+read if only two.]
+
+## Notation {.unnumbered #sec-notation}
+
+<!-- Technical sources only. Bold the collisions. -->
+
+| Symbol | Meaning |
+|---|---|
+| $x$ | ... |
+
+: Symbols and their collisions {#tbl-notation}
+
+# [First Section Title] {#sec-first}
+
+*Pages 000–000.*
+
+::: {.callout-note title="In one paragraph"}
+[A dense, complete summary. Someone reading only these should be able to follow
+the argument end to end.]
+:::
+
+**[Bolded lead-in naming what this paragraph does.]** [Substance.]
+
+## [Subsection] {#sec-slug}
+
+<!-- Quote the author's own concessions. Box key claims in .callout-important.
+     Flag traps in .callout-warning. Math in $…$, never bare Unicode. -->
+
+# Study Apparatus {.unnumbered #sec-apparatus}
+
+## The argument in one page {.unnumbered}
+
+<!-- Write this LAST, from the finished walkthrough. Cross-reference numbered
+     sections with @sec-slug; use [text](#sec-slug) for unnumbered ones. -->
+
+1.  [Step.] (@sec-first)
+
+## Glossary of key terms {.unnumbered}
+
+| Term | Meaning as [AUTHOR] uses it |
+|---|---|
+| **[term]** | [definition, capturing idiosyncratic usage] |
+
+: Key terms {#tbl-glossary}
+
+## Key results to mark {.unnumbered}
+
+| Page | Result |
+|---|---|
+| 000 | ... |
+
+: Key results {#tbl-results}
+
+## Derivations worth doing yourself {.unnumbered #sec-derivations}
+
+<!-- Technical sources. Include one that corrects the source and one that
+     reveals something the source doesn't remark on. -->
+
+1.  **[Name].** [Setup, then the answer so the reader can check themselves.]
+
+## Common misreadings to avoid {.unnumbered #sec-misreadings}
+
+::: {.callout-warning title="[N] traps"}
+1.  **"[The misreading, in the reader's own likely words.]"** [The correction.]
+:::
+
+## Questions for discussion {.unnumbered #sec-questions}
+
+1.  [Genuinely open; name what is at stake and where the author leaves it
+    hanging.]
+
+## Where this connects {.unnumbered #sec-connects}
+
+**Within the folder.**
+
+| Reference in this [paper/book] | File in this folder |
+|---|---|
+| [00] ... | `filename.pdf` |
+
+: Citations you already have {#tbl-folder}
+
+**Reading order.** [Which sibling source to read first, and why.]
+
+**Outside the folder.** [The surrounding literature and this source's position.]
+
+## A note on the text {.unnumbered #sec-notetext}
+
+::: {.callout-tip title="What checked out"}
+[Lead with what held. A positive verification tells the reader how far to trust
+the rest.]
+:::
+
+### Errors in the printed [article/chapter] {.unnumbered}
+
+| Location | Printed | Should be |
+|---|---|---|
+| p. 000 | ... | ... |
+
+: Print errata {#tbl-errata}
+
+### Reference-list slips (checked externally) {.unnumbered}
+
+-   [Give the reasoning so the reader can judge.]
+
+### Artifacts of the Markdown conversion (not in the print) {.unnumbered}
+
+-   [Explicitly not the author's fault.]
