@@ -27,4 +27,5 @@ beside the scripts and fill it in; `.env` files are git-ignored.
 | `calendar-sync` | Parse markdown planning docs for deadlines, meetings, and conferences and batch-add them to Fantastical. |
 | `reading-guide` | Produce a CliffsNotes-style reading guide to a paper or chapter, delivered as Markdown, a published Artifact, and a Quarto document. |
 | `slides` | Build a lecture deck (Metropolis Beamer PDF, revealjs HTML, Typst handout) in the course theme via the `usu-slides` Quarto extension. |
+| `socrates` | Run a Socratic dialogue on a reading: Claude plays Socrates and questions you until you can state the text and your analysis of it in your own words; summary and transcript saved beside the source. |
 | `todoist-sync` | Scan markdown files for TODO items and sync them to Todoist. |
