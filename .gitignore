@@ -22,3 +22,6 @@ dist/
 # Agent skills: local secrets and sync state
 skills/**/.env
 skills/**/.todoist-sync-state.json
+
+# Quarto render cache
+.quarto/

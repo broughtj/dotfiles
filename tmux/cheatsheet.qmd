@@ -1,0 +1,174 @@
+---
+pagetitle: "tmux cheatsheet"
+format:
+  typst:
+    papersize: us-letter
+    mainfont: "Fira Sans"
+    fontsize: 9pt
+    margin:
+      x: 0.45in
+      y: 0.4in
+---
+
+<!--
+  One-page cheatsheet for tmux/tmux.conf.
+  Render:  quarto render cheatsheet.qmd      (writes cheatsheet.pdf)
+  The layout is written directly in Typst; edit the rows in the sections below.
+  A row is (custom?, keys, action). `true` marks a binding or setting that
+  comes from tmux.conf; `false` marks a stock tmux default.
+-->
+
+```{=typst}
+#let navy  = rgb("#1f3a5f")
+#let gold  = rgb("#c8922a")
+#let muted = luma(95)
+#let mono  = "Fira Mono"
+
+#set page(flipped: true, numbering: none, margin: (x: 0.45in, y: 0.4in))
+#set text(font: "Fira Sans", size: 10pt)
+#set par(leading: 0.5em, spacing: 0.6em, justify: false)
+
+// ---- building blocks -------------------------------------------------------
+
+#let cap(body, fill: luma(244), stroke: luma(160), ink: black) = box(
+  inset: (x: 4pt), outset: (y: 3pt), radius: 2.5pt,
+  fill: fill, stroke: 0.5pt + stroke,
+  text(font: mono, size: 9pt, fill: ink, body),
+)
+#let P = cap("P", fill: navy, stroke: navy, ink: white)
+
+// k("P", "c") draws a chord; the string "P" becomes the prefix cap.
+#let k(..keys) = keys.pos().map(x => if x == "P" { P } else { cap(x) }).join(h(2.5pt))
+#let alt = text(fill: muted, size: 9pt, "/")
+#let dot = box(circle(radius: 2.3pt, fill: gold), baseline: -1.4pt)
+#let cmd(s) = text(font: mono, size: 8.8pt, s)
+
+#let heading-bar(title) = block(
+  width: 100%, below: 7pt, inset: (bottom: 4pt),
+  stroke: (bottom: 0.7pt + navy),
+  text(weight: "bold", size: 10pt, fill: navy, tracking: 0.6pt, upper(title)),
+)
+
+#let rows(items) = grid(
+  columns: (9pt, auto, 1fr),
+  column-gutter: (0pt, 9pt),
+  row-gutter: 8.5pt,
+  align: (left + horizon, left + horizon, left + horizon),
+  ..items.map(r => (if r.at(0) { dot } else { [] }, r.at(1), r.at(2))).flatten()
+)
+
+// A section is a heading, an optional note, then one or more groups of rows.
+#let sec(title, ..groups, note: none) = block(breakable: false, width: 100%, below: 18pt)[
+  #heading-bar(title)
+  #if note != none { block(below: 8pt, text(size: 8.5pt, fill: muted, note)) }
+  #groups.pos().map(rows).join(v(4pt))
+]
+
+// ---- header ----------------------------------------------------------------
+
+#grid(
+  columns: (1fr, auto),
+  align: (left + bottom, right + bottom),
+  [
+    #text(size: 20pt, weight: "bold", fill: navy)[tmux]
+    #h(4pt)
+    #text(size: 20pt, weight: "light", fill: muted)[cheatsheet]
+  ],
+  text(size: 9pt)[
+    #P #h(3pt) prefix, #cap("C-a") (press, release, then the next key)
+    #h(12pt)
+    #dot #h(3pt) defined in #cmd("tmux.conf") #h(4pt)
+    #text(fill: muted)[unmarked rows are tmux defaults]
+  ],
+)
+#v(-2pt)
+#line(length: 100%, stroke: 1.2pt + gold)
+#v(4pt)
+
+// ---- body ------------------------------------------------------------------
+
+#columns(3, gutter: 22pt)[
+
+#sec("Sessions", note: [One session per project. Detach instead of quitting.], (
+  (false, cmd("tmux new -s proj"),          [new session]),
+  (false, cmd("tmux ls"),                   [list sessions]),
+  (false, cmd("tmux a -t proj"),            [reattach]),
+  (false, cmd("tmux kill-session -t proj"), [tear one down]),
+), (
+  (false, k("P", "d"),                      [detach, leave it running]),
+  (false, k("P", "s"),                      [pick a session from a list]),
+  (false, [#k("P", "(") #alt #k("P", ")")],  [previous / next session]),
+  (false, k("P", "$"),                      [rename the session]),
+))
+
+#sec("Windows", note: [Numbered from 1. #cmd("C-S-←/→") and #cmd("F1") take no prefix.], (
+  (true,  k("P", "c"),                       [new window, same dir]),
+  (false, [#k("P", "n") #alt #k("P", "p")],   [next / previous window]),
+  (false, [#k("P", "1") … #k("9")],          [jump to window by number]),
+  (false, k("P", "w"),                       [pick a window from a list]),
+  (false, k("P", ","),                       [rename the window]),
+  (true,  [#k("C-S-←") #alt #k("C-S-→")], [move window left / right]),
+  (true,  k("F1"),                           [renumber, closing gaps]),
+  (false, k("P", "&"),                       [kill the window]),
+))
+
+#colbreak()
+
+#sec("Panes", note: [Mouse is on: click to focus, drag a border to resize. \ "Same dir" is the active pane's working directory.], (
+  (true,  k("P", "%"),                       [split left / right, same dir]),
+  (true,  k("P", "\""),                      [split top / bottom, same dir]),
+  (false, [#P #h(2.5pt) #cap("←") #cap("↓") #cap("↑") #cap("→")], [move between panes]),
+  (false, k("P", "o"),                       [next pane]),
+  (false, k("P", "z"),                       [zoom / unzoom the pane]),
+  (false, [#k("P", "{") #alt #k("P", "}")],   [swap with previous / next]),
+  (false, k("P", "Space"),                   [cycle through layouts]),
+  (false, k("P", "!"),                       [break pane into a window]),
+  (false, k("P", "x"),                       [kill the pane]),
+))
+
+#sec("Popups", note: [Floating scratch windows. They close when the command exits.], (
+  (true, k("P", "C-t"), [#cmd("zsh"), same dir]),
+  (true, k("P", "C-j"), [#cmd("julia --project=.")]),
+  (true, k("P", "C-p"), [#cmd("ipython")]),
+  (true, k("P", "C-z"), [#cmd("nvim ~/.zshrc")]),
+))
+
+#colbreak()
+
+#sec("Copy mode", note: [Vi keys. Scrollback is 100,000 lines.], (
+  (false, k("P", "["),                       [enter copy mode]),
+  (true,  [mouse wheel],                     [enter copy mode and scroll]),
+  (false, [#cap("h") #cap("j") #cap("k") #cap("l")], [move the cursor]),
+  (false, [#k("C-u") #alt #k("C-d")],         [half page up / down]),
+  (false, [#k("g") #alt #k("G")],             [top / bottom of history]),
+  (false, [#k("/") #alt #k("?")],             [search forward / backward]),
+  (false, [#k("n") #alt #k("N")],             [next / previous match]),
+  (false, k("Space"),                        [start selection]),
+  (false, k("Enter"),                        [copy selection and leave]),
+  (false, k("q"),                            [leave copy mode]),
+  (false, k("P", "]"),                       [paste]),
+))
+
+#sec("Config", (
+  (true,  k("P", "r"),   [reload #cmd("tmux.conf")]),
+  (true,  k("P", "C-a"), [send a literal #cmd("C-a") to the program]),
+  (false, k("P", "?"),   [list every key binding]),
+  (false, k("P", ":"),   [tmux command prompt]),
+))
+
+#block(breakable: false, width: 100%, inset: 9pt, radius: 3pt, fill: luma(246))[
+  #text(weight: "bold", size: 9.5pt, fill: navy)[Settings worth remembering]
+  #set text(size: 9pt)
+  #set list(marker: text(fill: gold)[•], indent: 0pt, body-indent: 5pt, spacing: 5pt)
+  - #cmd("escape-time 0"): Esc is instant in Neovim.
+  - Focus events and extended keys (#cmd("csi-u")) are on, so programs see focus changes and modifier combos.
+  - The terminal title follows the active pane's title.
+  - Status line: session on the left, host on the right. Catppuccin Mocha; needs a Nerd Font.
+]
+
+]
+
+#place(bottom + right, text(size: 7.5pt, fill: muted)[
+  Source: #cmd("~/.config/tmux/tmux.conf")
+])
+```
