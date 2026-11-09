@@ -1,0 +1,47 @@
+# tmux: cheatsheet build and config sync
+
+live := env_var('HOME') / ".config/tmux/tmux.conf"
+doc  := "cheatsheet"
+
+# List the recipes
+default:
+    @just --list
+
+# --- cheatsheet ---------------------------------------------------------------
+
+# Compile the cheatsheet to PDF
+render:
+    quarto render {{doc}}.qmd
+
+# Compile, then open the PDF
+open: render
+    open {{doc}}.pdf
+
+# Recompile on every save, with a live preview
+watch:
+    quarto preview {{doc}}.qmd
+
+# Remove build byproducts (keeps the tracked PDF)
+clean:
+    rm -rf .quarto {{doc}}.typ
+
+# --- config -------------------------------------------------------------------
+
+# Show how the live config differs from the tracked copy
+diff:
+    @diff -u tmux.conf {{live}} && echo "tmux.conf: tracked and live copies match"
+
+# Copy the tracked config into place and reload tmux
+install:
+    mkdir -p {{parent_directory(live)}}
+    cp tmux.conf {{live}}
+    @just reload
+
+# Copy the live config back into the repo
+pull:
+    cp {{live}} tmux.conf
+    @git status --short tmux.conf
+
+# Reload the live config in the running tmux server, if there is one
+reload:
+    @tmux source-file {{live}} 2>/dev/null && echo "tmux: reloaded" || echo "tmux: no server running, nothing to reload"
